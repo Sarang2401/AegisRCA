@@ -1,0 +1,25 @@
+[
+  {
+    "pattern": "connection pool exhausted",
+    "root_cause": "Database connection pool exhaustion",
+    "suggested_actions": [
+      "scale_asg",
+      "restart_ec2"
+    ]
+  },
+  {
+    "pattern": "out of memory",
+    "root_cause": "Application memory leak",
+    "suggested_actions": [
+      "restart_ec2",
+      "scale_asg"
+    ]
+  },
+  {
+    "pattern": "timeout",
+    "root_cause": "Upstream service latency",
+    "suggested_actions": [
+      "scale_asg"
+    ]
+  }
+]
