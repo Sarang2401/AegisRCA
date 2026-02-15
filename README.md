@@ -1,107 +1,148 @@
-🛡 AegisRCA — AI-Assisted Root Cause Analysis for AWS Incidents
+# 🛡 AegisRCA  
+**AI-Assisted Root Cause Analysis & Safe Auto-Remediation for AWS**
 
-AegisRCA is an event-driven AWS incident response system that performs AI-assisted root cause analysis and safely executes limited auto-remediation using guardrail-enforced policies.
+AegisRCA is an event-driven AWS incident response system that performs structured AI-assisted root cause analysis and safely executes limited auto-remediation using guardrail-enforced policies.
 
-Built using AWS Lambda, EventBridge, CloudWatch, Auto Scaling, SSM, and S3 — fully compatible with AWS Free Tier.
+Built using:
+- AWS Lambda
+- CloudWatch
+- EventBridge
+- Auto Scaling
+- SSM
+- S3
+- Python (boto3)
 
-🚀 Problem Statement
+Fully compatible with AWS Free Tier.
 
-When infrastructure incidents occur (e.g., CPU spikes, application failures), engineers must:
+---
 
-Investigate logs and metrics
+# 🚀 Problem Statement
 
-Identify root cause
+When infrastructure incidents occur (e.g., CPU spikes or application instability), engineers must:
 
-Decide on safe remediation
+- Investigate metrics and logs
+- Identify the root cause
+- Decide on safe remediation
+- Document the incident
 
-Document everything
+This process is manual, slow, and error-prone.
 
-This process is slow, manual, and error-prone.
+---
 
-🧠 Solution Overview
+# 🧠 Solution Overview
 
-AegisRCA automates incident analysis while enforcing strict safety controls.
+AegisRCA automates analysis while enforcing strict safety controls.
 
-When a CloudWatch alarm triggers:
+### Incident Flow
 
-📡 EventBridge invokes Collector Lambda
+1. CloudWatch Alarm triggers  
+2. EventBridge invokes Collector Lambda  
+3. Logs and metrics are gathered  
+4. AI module analyzes incident context  
+5. Decision engine enforces guardrails  
+6. Safe actions execute automatically  
+7. Incident report is stored in S3  
 
-📊 Logs and metrics are gathered
-
-🤖 AI module analyzes incident context
-
-🛡 Decision engine enforces guardrails
-
-⚙️ Safe actions execute automatically
-
-📄 Incident report is generated and stored in S3
-
-AI suggests.
-Policy engine enforces.
+AI suggests.  
+Policy engine enforces.  
 Executor executes safely.
 
-🏗 Architecture
+---
+
+# 🏗 Architecture
+
 CloudWatch Alarm
-        ↓
-EventBridge
-        ↓
+│
+▼
+EventBridge Rule
+│
+▼
 Collector Lambda
-        ↓
+│
+▼
 AI Analysis Module
-        ↓
+│
+▼
 Decision Engine (Guardrails)
-        ↓
-Remediation Lambda
-        ↓
+│
+├── SAFE → Remediation Lambda
+│
+└── NEEDS_APPROVAL → Hold
+│
+▼
+Report Generator
+│
+▼
 S3 (Markdown + JSON Audit Reports)
 
-🧱 Tech Stack
 
-AWS Lambda (Python 3.11)
+---
 
-CloudWatch Alarms & Metrics
+# 🧱 Tech Stack
 
-EventBridge
+- AWS Lambda (Python 3.11)
+- CloudWatch Metrics & Alarms
+- EventBridge
+- Auto Scaling
+- AWS Systems Manager (SSM)
+- Amazon S3
+- boto3
+- IAM (Least Privilege Design)
 
-Auto Scaling
+---
 
-SSM (EC2 restart)
-
-S3 (audit storage)
-
-boto3
-
-IAM (least privilege design)
-
-🔐 Safety Design
+# 🔐 Safety Design
 
 The system enforces strict guardrails:
 
-❌ No deletion operations allowed
+- ❌ No deletion operations allowed
+- 📏 Auto Scaling must respect min/max limits
+- ⚠ EC2 restarts require approval
+- 🔁 Idempotent remediation (prevents duplicate actions)
+- 📝 Full audit logging
 
-📏 Auto Scaling must respect min/max limits
+The AI module has **no AWS execution privileges**.
 
-⚠ EC2 restarts require approval
+---
 
-🔁 Idempotent remediation (prevents duplicate actions)
+# 📂 Project Structure
 
-📝 Full audit logging of all decisions
-
-AI has no direct execution privileges.
-
-📦 Project Structure
 aegis-rca/
 │
 ├── collector_lambda/
+│ ├── handler.py
+│ └── collector.py
+│
 ├── ai_module/
+│ ├── analyzer.py
+│ ├── prompt_template.txt
+│ └── mock_knowledge_base.json
+│
 ├── decision_engine/
+│ ├── safety_evaluator.py
+│ └── policy_rules.py
+│
 ├── remediation_lambda/
+│ ├── handler.py
+│ ├── executor.py
+│ └── idempotency.py
+│
 ├── report_generator/
+│ ├── report_builder.py
+│ └── s3_writer.py
+│
 ├── infrastructure/
+│ ├── iam_policies/
+│ └── eventbridge_rule.json
+│
 └── README.md
 
-📄 Example Incident Output
-AI Analysis Output
+
+---
+
+# 📄 Example AI Output
+
+```json
 {
   "root_cause": "Database connection pool exhaustion",
   "confidence_score": 0.85,
@@ -115,52 +156,60 @@ AI Analysis Output
     }
   ]
 }
-
-Generated Markdown Report (Stored in S3)
+📄 Example Incident Report (Stored in S3)
 # Incident Report — inc-20260215-001
 
-Root Cause: Database connection pool exhaustion
-Confidence: 0.85
+Root Cause: Database connection pool exhaustion  
+Confidence: 0.85  
 
 Approved Actions:
 - scale_asg → SUCCESS
+📊 Demonstration (Add Screenshots Here)
+You can add real AWS console screenshots in:
 
-🎯 Key Engineering Highlights
+docs/screenshots/
+Example:
 
-Event-driven architecture
+## CloudWatch Alarm Triggered
+![Alarm](docs/screenshots/alarm.png)
+
+## Auto Scaling Updated
+![ASG](docs/screenshots/asg_scaled.png)
+
+## Generated Incident Report
+![Report](docs/screenshots/report.png)
+🎯 Engineering Highlights
+Event-driven AWS architecture
 
 Structured AI integration with deterministic guardrails
 
 Safe Auto Scaling automation
 
-SSM-based EC2 recovery
+EC2 restart via SSM
 
-IAM least privilege design
+IAM least privilege enforcement
 
 Audit-ready documentation pipeline
 
 💰 AWS Free Tier Compatible
-
 Lambda-based (no containers)
 
 No RDS
 
-No paid AI services
+No external paid AI service required
 
-Minimal S3 usage
+Minimal S3 storage
 
-No long-running infrastructure
+No long-running compute
 
 🔮 Future Improvements
-
-DynamoDB for persistent idempotency
+DynamoDB-backed idempotency
 
 Slack/SNS approval workflow
 
-Infrastructure-as-Code (Terraform/SAM)
+Terraform or AWS SAM for IaC
 
-Real LLM integration with prompt controls
+Real LLM integration with structured output validation
 
 👤 Author
-
 Built as a cloud engineering portfolio project demonstrating event-driven AWS automation and safe AI-assisted remediation.
